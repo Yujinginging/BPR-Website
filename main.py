@@ -129,10 +129,13 @@ option = st.selectbox(
     ('10', '20', '30', '50', '100'))
 
 if st.button('Predict', key='Predict'):
-    df = Controllers.GroundwaterController.read_xyz(xyz_path) # ('C:/Users/JingJing/Desktop/S7/BPR2/GRW_MBS_50m.xyz')
+    if xyz_path is not None and dbf_path is not None:
+        df = Controllers.GroundwaterController.read_xyz(xyz_path) # ('C:/Users/JingJing/Desktop/S7/BPR2/GRW_MBS_50m.xyz')
 
     # transfer to csv and display
-    csv = Controllers.ViewPipeController.to_csv(dbf_path) # ('C:/Users/JingJing/Downloads/Archive (1) (1)/Energi_Viborg_Dandas_data.dbf')
+        csv = Controllers.ViewPipeController.to_csv(dbf_path) # ('C:/Users/JingJing/Downloads/Archive (1) (1)/Energi_Viborg_Dandas_data.dbf')
+    else:
+        st.error("Wrong input")
     # transfer to csv and display
     data = pd.read_csv(csv)
     # data preparation:
