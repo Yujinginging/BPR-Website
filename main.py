@@ -24,9 +24,6 @@ import Controllers
 now = date.today().year
 
 
-
-
-
 class View:
     def format_color_groups_forPipeStatus(df):
         colors = ['green', 'red']
@@ -107,12 +104,7 @@ def add_depth_all(datacopy):
     return get_matched_depth_all(select_x, select_y)
 
 
-
-
-
-
-
-
+# streamlit page
 st.title("Welcome")
 
 # upload ground water
@@ -130,10 +122,12 @@ option = st.selectbox(
 
 if st.button('Predict', key='Predict'):
     if xyz_path is not None and dbf_path is not None:
-        df = Controllers.GroundwaterController.read_xyz(xyz_path) # ('C:/Users/JingJing/Desktop/S7/BPR2/GRW_MBS_50m.xyz')
+        df = Controllers.GroundwaterController.read_xyz(
+            xyz_path)  # ('C:/Users/JingJing/Desktop/S7/BPR2/GRW_MBS_50m.xyz')
 
-    # transfer to csv and display
-        csv = Controllers.ViewPipeController.to_csv(dbf_path) # ('C:/Users/JingJing/Downloads/Archive (1) (1)/Energi_Viborg_Dandas_data.dbf')
+        # transfer to csv and display
+        csv = Controllers.ViewPipeController.to_csv(
+            dbf_path)  # ('C:/Users/JingJing/Downloads/Archive (1) (1)/Energi_Viborg_Dandas_data.dbf')
     else:
         st.error("Wrong input")
     # transfer to csv and display
@@ -189,7 +183,8 @@ if st.button('Predict', key='Predict'):
     #
     st.dataframe(data_target)
 
-    X_trainval, X_test, y_trainval, y_test, dec_tree = Controllers.PredictPipeController.DicisionTree(data_features, data_target)
+    X_trainval, X_test, y_trainval, y_test, dec_tree = Controllers.PredictPipeController.DicisionTree(data_features,
+                                                                                                      data_target)
 
     dec_tree.fit(X_trainval, y_trainval)
 
@@ -197,21 +192,21 @@ if st.button('Predict', key='Predict'):
     prediction = dec_tree.predict(data_features_all)
     SearchedDataAll["Predict pipe status"] = prediction
 
-
     st.subheader("Pipe status Predict Result: ")
     st.dataframe(pd.DataFrame(SearchedDataAll).style.apply(View.format_color_groups_forPrediction, axis=None))
 
     # age prediction processing
-    age_prediction = Controllers.PredictPipeController.Lasso_AgePrediction(data_features_age, data_target_age, data_features_all_age)
+    age_prediction = Controllers.PredictPipeController.Lasso_AgePrediction(data_features_age, data_target_age,
+                                                                           data_features_all_age)
     #
 
     SearchedDataAll_copy['Predict Age'] = age_prediction
 
     SearchedDataAll_copy['Possible broken year'] = (now + (
-    SearchedDataAll_copy[SearchedDataAll_copy['Predict Age'] > SearchedDataAll_copy['Age']]['Predict Age']) - (
-                                                   SearchedDataAll_copy[
-                                                       SearchedDataAll_copy['Predict Age'] > SearchedDataAll_copy[
-                                                           'Age']]['Age'])).astype(int)
+        SearchedDataAll_copy[SearchedDataAll_copy['Predict Age'] > SearchedDataAll_copy['Age']]['Predict Age']) - (
+                                                        SearchedDataAll_copy[
+                                                            SearchedDataAll_copy['Predict Age'] > SearchedDataAll_copy[
+                                                                'Age']]['Age'])).astype(int)
 
     st.subheader("Pipe possible broken year Predict Result: ")
     st.dataframe(SearchedDataAll_copy)
@@ -222,10 +217,11 @@ X_coordinate = st.text_input("Enter X coordinate: ")
 Y_coordinate = st.text_input("Enter Y coordinate: ")
 
 if st.button("Search", key="Search"):
-    df = Controllers.GroundwaterController.read_xyz(xyz_path) #('C:/Users/JingJing/Desktop/S7/BPR2/GRW_MBS_50m.xyz')
+    df = Controllers.GroundwaterController.read_xyz(xyz_path)  # ('C:/Users/JingJing/Desktop/S7/BPR2/GRW_MBS_50m.xyz')
 
     # transfer to csv and display
-    csv = Controllers.ViewPipeController.to_csv(dbf_path) #('C:/Users/JingJing/Downloads/Archive (1) (1)/Energi_Viborg_Dandas_data.dbf')
+    csv = Controllers.ViewPipeController.to_csv(
+        dbf_path)  # ('C:/Users/JingJing/Downloads/Archive (1) (1)/Energi_Viborg_Dandas_data.dbf')
     # transfer to csv and display
     data = pd.read_csv(csv)
     # data preparation:
@@ -279,7 +275,8 @@ if st.button("Search", key="Search"):
     # #
     # st.dataframe(data_target)
 
-    X_trainval, X_test, y_trainval, y_test, dec_tree = Controllers.PredictPipeController.DicisionTree(data_features, data_target)
+    X_trainval, X_test, y_trainval, y_test, dec_tree = Controllers.PredictPipeController.DicisionTree(data_features,
+                                                                                                      data_target)
 
     dec_tree.fit(X_trainval, y_trainval)
 
@@ -291,7 +288,8 @@ if st.button("Search", key="Search"):
     st.dataframe(pd.DataFrame(SearchedDataAll).style.apply(View.format_color_groups_forPrediction, axis=None))
 
     # age prediction processing
-    age_prediction = Controllers.PredictPipeController.Lasso_AgePrediction(data_features_age, data_target_age, data_features_all_age)
+    age_prediction = Controllers.PredictPipeController.Lasso_AgePrediction(data_features_age, data_target_age,
+                                                                           data_features_all_age)
     #
 
     SearchedDataAll_copy['Predict Age'] = age_prediction
@@ -307,28 +305,31 @@ if st.button("Search", key="Search"):
 
     SearchedDataAll = pd.DataFrame(SearchedDataAll)
     # search result
-    if id_pipe is not None and X_coordinate is None and Y_coordinate is None:
+    if len(id_pipe):
         pipe = SearchedDataAll.loc[SearchedDataAll['ID'] == int(id_pipe)]
         st.subheader("Search Result for pipes: ")
         pipe = pd.DataFrame(pipe).style.apply(View.format_color_groups_forPrediction, axis=None)
         st.dataframe(pipe)
 
-        #age
+        # age
         age = SearchedDataAll_copy.loc[SearchedDataAll_copy['ID'] == int(id_pipe)]
         st.subheader("Search Result for age: ")
         st.dataframe(age)
+        # st.write(int(id_pipe))
+        # st.dataframe(SearchedDataAll_copy.loc[SearchedDataAll_copy['ID'] == 87832])
 
-    elif X_coordinate is not None and Y_coordinate is not None:
+    elif (len(X_coordinate)) and (len(Y_coordinate)):
         pipe = SearchedDataAll.loc[
-            (SearchedDataAll['XKoordinat'].astype(int) == int(float(X_coordinate))) & (
-                        SearchedDataAll['YKoordinat'].astype(int) == int(float(Y_coordinate)))]
+            (SearchedDataAll['XKoordinat'] == float(X_coordinate)) & (
+                    SearchedDataAll['YKoordinat'] == float(Y_coordinate))]
         st.subheader("Search Result: ")
         pipe = pd.DataFrame(pipe).style.apply(View.format_color_groups_forPrediction, axis=None)
 
         st.dataframe(pipe)
 
-        #age
-        age = SearchedDataAll_copy.loc[(SearchedDataAll_copy['XKoordinat'].astype(int) == int(float(X_coordinate)))&(SearchedDataAll_copy['YKoordinat'].astype(int) == int(float(Y_coordinate)))]
+        # age
+        age = SearchedDataAll_copy.loc[(SearchedDataAll_copy['XKoordinat'] == float(X_coordinate)) & (
+                    SearchedDataAll_copy['YKoordinat'] == float(Y_coordinate))]
         st.subheader("Search Result for age: ")
         st.dataframe(age)
     else:
